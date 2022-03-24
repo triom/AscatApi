@@ -35,15 +35,6 @@ firebaseConfig = {"apiKey": "AIzaSyBSMoPq9LbUPrUXw8GsFf4e35YH63IrcAI",
 fbase = pyrebase.initialize_app(firebaseConfig)
 Database = fbase.database()
 
-#useless just a test works for post
-
-@app.route('/orders', methods=['GET', 'POST'])
-def post():
-  choiceCoffee = {'image': 'gs:/ascat-cbb31.appspot.com/images/ROSSO.jpg', 'name': 'test', 'intensity': 5,
-                  'aroma': 'cer'}
-  result = firebase.post('/coffee', choiceCoffee)
-  print(result)
-
 #mettre a jour la donné du choix de café
 @app.route('/order/coffee1', methods=['GET'])
 def orderCoffee():
@@ -58,7 +49,7 @@ def orderCoffee():
     print(results)
     print(result)
     #mettre a jour la donnée pour le robot
-    Database.child("order").child("1").update({"coffeeChoice": result["coffeeChoice"], "size": result["quantity"]})
+    Database.child("order").child("1").update({"coffeeChoice": result["coffeeChoice"], "listener": result["listener"]})
     #supprimer de la bd l'ancienne valeur
     return json.dumps(result, indent=4)
 
@@ -66,7 +57,7 @@ def orderCoffee():
 #enregistrer la commande  d'un café
 @app.route('/order', methods=['GET', 'POST'])
 def fillOrderBUffer():
-    choiceCoffee = {'coffeeChoice': 2, 'quantity': 0}
+    choiceCoffee = {'coffeeChoice': 5, 'listener': 0}
     result = firebase.post('/orderBuffer', choiceCoffee)
     return json.dumps(choiceCoffee, indent=4)
 
@@ -78,9 +69,10 @@ def getCoffee():
     result = firebase.get('/coffee', None)
     return json.dumps(result, indent=4)
 
+#changer la quantité de cafés et d'eau restante
 @app.route('/ressource', methods=['GET'])
 def manageResources():
-    coffee = {"coffeeChoice": 1, "quantity": 1}
+    coffee = {"coffeeChoice": 1, "listener": 0}
     resources = firebase.get('/resources', None)  # recuperer les ressources de notre base de données
     # debug
     print(resources)
